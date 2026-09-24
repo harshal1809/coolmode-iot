@@ -17,19 +17,18 @@
   LCD 16x2 I2C SDA  D2             GPIO 4       Connect to I2C Backpack SDA (GND to GND)
   ---------------------------------------------------------------------------------------
 
-  REQUIRED ARDUINO LIBRARIES:
-  1. ESP8266WiFi (Included with ESP8266 Board Package)
-  2. ESP8266HTTPClient (Included with ESP8266 Board Package)
-  3. DHT sensor library by Adafruit (Install via Library Manager)
-  4. Adafruit Unified Sensor by Adafruit (Dependency for DHT)
-  5. LiquidCrystal_I2C by Frank de Brabander (Install via Library Manager)
-  6. ArduinoJson by Benoit Blanchon (Version 6.x or 7.x, Install via Library Manager)
+  REQUIRED ARDUINO LIBRARIES (Install via Library Manager in Arduino IDE):
+  1. ESP8266WiFi & ESP8266HTTPClient (Built into ESP8266 Board Package)
+  2. DHT sensor library by Adafruit
+  3. Adafruit Unified Sensor by Adafruit (Dependency for DHT)
+  4. LiquidCrystal_I2C by Frank de Brabander
+  5. ArduinoJson by Benoit Blanchon (Version 6.x or 7.x)
  =========================================================================================
 */
 
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#include <WiFiClient.h>
+#include <WiFiClientSecure.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <DHT.h>
@@ -42,12 +41,9 @@ const char* WIFI_SSID     = "CoE Yavatmal";
 const char* WIFI_PASSWORD = "shoaib845";
 
 // ==========================================
-// 2. BACKEND SERVER CONFIGURATION
+// 2. LIVE RENDER CLOUD SERVER CONFIGURATION
 // ==========================================
-// For Local Testing: Use your laptop's local IP (e.g., "http://192.168.1.15:3000")
-// For Render Cloud: Use your Render web service URL (e.g., "http://coolmode-iot.onrender.com" or https)
-// NOTE: Make sure to include "http://" or "https://"
-const char* SERVER_URL = "http://192.168.1.100:3000"; // REPLACE with your server IP or Render URL
+const char* SERVER_URL = "https://coolmode-iot-3.onrender.com";
 
 // Device Sync Endpoint: POST /api/device/sync
 String syncEndpoint = String(SERVER_URL) + "/api/device/sync";
@@ -71,7 +67,7 @@ unsigned long lastPollTime = 0;
 String lastLine1 = "";
 String lastLine2 = "";
 
-// Helper to center or pad strings to 16 characters
+// Helper to format/pad strings to 16 characters for 16x2 LCD
 String formatLcdLine(String text) {
   if (text.length() > 16) {
     return text.substring(0, 16);
@@ -89,6 +85,7 @@ void setup() {
   Serial.println("\n\n=======================================================");
   Serial.println("  COOLMODE IoT - GCOE YAVATMAL ELECTRICAL DEPT");
   Serial.println("  Authors: JAYESH AND PRAKASH");
+  Serial.printf("  Server: %s\n", SERVER_URL);
   Serial.println("=======================================================");
 
   // Initialize LED Pin
@@ -175,11 +172,11 @@ void loop() {
       Serial.printf("[SENSOR READ] Temp: %.1f °C  |  Humidity: %.1f %%\n", temperature, humidity);
     }
 
-    // 2. Synchronize with COOLMODE Cloud Server
+    // 2. Synchronize with Live Render Server
     if (WiFi.status() == WL_CONNECTED) {
       syncWithServer(temperature, humidity);
     } else {
-      // Offline fallback: Reconnect & display local sensor reading on LCD
+      // Offline fallback: Attempt reconnection & display readings locally
       Serial.println("[WARN] WiFi disconnected. Attempting reconnection...");
       WiFi.reconnect();
 
@@ -193,12 +190,17 @@ void loop() {
   }
 }
 
-// Perform Cloud Sync (Sends DHT11 data, receives LED & LCD updates in single pulse)
+// Perform Cloud Sync over HTTPS (Sends DHT11 data, receives LED & LCD updates in single pulse)
 void syncWithServer(float temp, float hum) {
-  WiFiClient client;
-  HTTPClient http;
+  // Use WiFiClientSecure for HTTPS connection to Render
+  WiFiClientSecure client;
+  client.setInsecure(); // Allows secure SSL connection without storing root certificates
 
-  Serial.print("[HTTP] Connecting to: ");
+  HTTPClient http;
+  http.setTimeout(12000); // 12-second timeout for cloud transmission
+  http.setFollowRedirects(HTTPC_STRICT_FOLLOW_REDIRECTS);
+
+  Serial.print("[HTTPS] Syncing with: ");
   Serial.println(syncEndpoint);
 
   if (http.begin(client, syncEndpoint)) {
@@ -212,7 +214,7 @@ void syncWithServer(float temp, float hum) {
     String requestBody;
     serializeJson(docOut, requestBody);
 
-    // Send HTTP POST
+    // Send HTTPS POST to Render
     int httpResponseCode = http.POST(requestBody);
 
     if (httpResponseCode == HTTP_CODE_OK || httpResponseCode == 201) {
@@ -241,12 +243,17 @@ void syncWithServer(float temp, float hum) {
     } else {
       Serial.printf("[HTTP ERROR] POST failed with code: %d\n", httpResponseCode);
       // Display error on LCD
-      updateLcd("Server Sync Err", "Code: " + String(httpResponseCode));
+      if (httpResponseCode == -1) {
+        updateLcd("Server Sleeping", "Waking Render...");
+      } else {
+        updateLcd("Server Sync Err", "Code: " + String(httpResponseCode));
+      }
     }
 
     http.end();
   } else {
-    Serial.println("[HTTP ERROR] Unable to initiate HTTP connection.");
+    Serial.println("[HTTP ERROR] Unable to initiate HTTPS connection to Render.");
+    updateLcd("HTTPS Connect", "Failed to start");
   }
 }
 

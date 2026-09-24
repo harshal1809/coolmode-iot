@@ -118,7 +118,7 @@ This application is 100% prepared for **Render**:
 5. Click **Create Web Service**.
 6. Once deployed, Render will provide a live URL such as:
    ```
-   https://coolmode-iot.onrender.com
+   https://coolmode-iot-3.onrender.com
    ```
 
 ---
@@ -139,7 +139,7 @@ This application is 100% prepared for **Render**:
 5. Open `firmware/esp8266_coolmode/esp8266_coolmode.ino`.
 6. Update `SERVER_URL`:
    - For local WiFi testing: `http://<YOUR_LAPTOP_IP>:3000` (Find using `ipconfig`)
-   - For Render cloud: `https://coolmode-iot.onrender.com`
+   - For Render cloud: `https://coolmode-iot-3.onrender.com`
 7. Select Board: **NodeMCU 1.0 (ESP-12E Module)** and your COM Port.
 8. Click **Upload**.
 
