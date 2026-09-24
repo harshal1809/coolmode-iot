@@ -1,0 +1,128 @@
+/* COOLMODE IoT Custom Styles */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+:root {
+  --font-main: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(17, 24, 39, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(55, 65, 81, 0.6);
+}
+
+/* Glowing LED Effects */
+.led-glow-on {
+  box-shadow: 0 0 25px 6px rgba(34, 197, 94, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.6);
+  background: radial-gradient(circle, #86efac 10%, #22c55e 60%, #15803d 100%);
+  animation: pulse-glow 2s infinite ease-in-out;
+}
+
+.led-glow-off {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  background: radial-gradient(circle, #64748b 10%, #475569 60%, #1e293b 100%);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 25px 6px rgba(34, 197, 94, 0.7);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 35px 10px rgba(34, 197, 94, 0.9);
+  }
+}
+
+/* 16x2 LCD Hardware Simulator Aesthetics */
+.lcd-screen-bezel {
+  background: #1a1e24;
+  border: 6px solid #2d3748;
+  border-radius: 8px;
+  box-shadow: inset 0 4px 8px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.lcd-display {
+  background: #0077b6; /* Classic 16x2 blue backlight */
+  color: #ffffff;
+  font-family: var(--font-mono);
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  border: 2px solid #005f73;
+}
+
+.lcd-display.lcd-green-mode {
+  background: #588157; /* Classic green-yellow LCD */
+  color: #1b4332;
+  text-shadow: 0 0 2px rgba(27, 67, 50, 0.6);
+  border: 2px solid #344e41;
+}
+
+.lcd-row {
+  height: 2.2rem;
+  line-height: 2.2rem;
+  overflow: hidden;
+  white-space: pre;
+}
+
+/* Circular Gauge Styles */
+.gauge-svg {
+  transform: rotate(-90deg);
+}
+
+.gauge-bg {
+  stroke: #e2e8f0;
+}
+
+.dark .gauge-bg {
+  stroke: #334155;
+}
+
+.gauge-progress {
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s ease;
+}
+
+/* Seek Bar / Range Indicator */
+.seek-bar-track {
+  height: 12px;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.seek-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}

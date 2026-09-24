@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>COOLMODE - IoT Environment Monitoring & Automation</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/css/custom.css">
+</head>
+<body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col justify-between transition-colors duration-300 antialiased selection:bg-blue-500 selection:text-white">
+
+  <!-- Top Navigation & Controls Bar -->
+  <header class="w-full border-b border-slate-200 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25">
+          <i class="fa-solid fa-microchip text-lg"></i>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">COOLMODE</span>
+          <span class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">IoT Suite</span>
+        </div>
+      </div>
+
+      <!-- Theme Switcher: Dual Button Structure -->
+      <div class="flex items-center space-x-3">
+        <div class="p-1 rounded-xl bg-slate-200/80 dark:bg-slate-800 flex items-center border border-slate-300/60 dark:border-slate-700 shadow-inner">
+          <button id="theme-light-btn" onclick="setTheme('light')" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+            <i class="fa-solid fa-sun text-amber-500"></i>
+            <span>Light</span>
+          </button>
+          <button id="theme-dark-btn" onclick="setTheme('dark')" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100">
+            <i class="fa-solid fa-moon text-blue-400"></i>
+            <span>Dark</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mandatory Subheader Banner -->
+    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 py-1.5 px-4 text-center text-xs font-medium tracking-wide text-white shadow-sm">
+      <i class="fa-solid fa-chart-line mr-2"></i>FORMATIVE INFORMATION ON TEMPERATURE AND HUMIDITY
+    </div>
+  </header>
+
+  <!-- Main Auth Container -->
+  <main class="flex-grow flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div class="w-full max-w-md">
+      
+      <!-- Card Container -->
+      <div class="glass-panel rounded-3xl shadow-2xl p-6 sm:p-8 relative overflow-hidden">
+        <!-- Ambient background gradient glow -->
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Header -->
+        <div class="text-center mb-6 relative">
+          <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Welcome to <span class="bg-gradient-to-r from-blue-500 to-cyan-400 bg-clip-text text-transparent">COOLMODE</span>
+          </h1>
+          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            Secure Access for IoT Smart Lab & Automation
+          </p>
+        </div>
+
+        <!-- Auth Tabs (Login / Register Switcher) -->
+        <div class="grid grid-cols-2 gap-1 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-2xl mb-6 border border-slate-200 dark:border-slate-700/60">
+          <button id="tab-login-btn" onclick="switchAuthTab('login')" class="py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm">
+            <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+            <span>Sign In</span>
+          </button>
+          <button id="tab-register-btn" onclick="switchAuthTab('register')" class="py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center justify-center space-x-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200">
+            <i class="fa-solid fa-user-plus text-xs"></i>
+            <span>Register</span>
+          </button>
+        </div>
+
+        <!-- Notification Message Banner -->
+        <div id="auth-alert" class="hidden mb-5 p-3.5 rounded-xl text-xs sm:text-sm font-medium flex items-center space-x-2 transition-all duration-200">
+          <i id="auth-alert-icon" class="fa-solid fa-circle-exclamation"></i>
+          <span id="auth-alert-msg"></span>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+          <div>
+            <label for="login-email" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              Email Address
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-regular fa-envelope"></i>
+              </div>
+              <input type="email" id="login-email" required placeholder="admin@coolmode.ac.in" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/60 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label for="login-password" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              Password
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-lock"></i>
+              </div>
+              <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/60 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm">
+              <button type="button" onclick="togglePasswordVisibility('login-password', this)" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="login-submit-btn" class="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold text-sm shadow-lg shadow-blue-500/25 active:scale-[0.98] transition flex items-center justify-center space-x-2">
+            <span>Sign In to Dashboard</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </form>
+
+        <!-- REGISTRATION FORM -->
+        <form id="register-form" onsubmit="handleRegister(event)" class="space-y-4 hidden">
+          <div>
+            <label for="register-name" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              Full Name
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-regular fa-user"></i>
+              </div>
+              <input type="text" id="register-name" required placeholder="Student / Researcher" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/60 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label for="register-email" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              Email Address
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-regular fa-envelope"></i>
+              </div>
+              <input type="email" id="register-email" required placeholder="name@college.edu" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/60 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm">
+            </div>
+          </div>
+
+          <div>
+            <label for="register-password" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+              Create Password
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i class="fa-solid fa-key"></i>
+              </div>
+              <input type="password" id="register-password" required minlength="6" placeholder="At least 6 characters" class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white/50 dark:bg-slate-900/60 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition text-sm">
+              <button type="button" onclick="togglePasswordVisibility('register-password', this)" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="register-submit-btn" class="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-sm shadow-lg shadow-emerald-500/25 active:scale-[0.98] transition flex items-center justify-center space-x-2">
+            <span>Create New Account</span>
+            <i class="fa-solid fa-user-check text-xs"></i>
+          </button>
+        </form>
+
+        <!-- Quick Demo Account Hint -->
+        <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-500 dark:text-slate-400">
+          <p><i class="fa-solid fa-shield-halved text-blue-500 mr-1"></i> ESP8266 IoT Cloud Ready | Render Deployable</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mandatory Footer -->
+  <footer class="w-full py-4 px-4 sm:px-6 bg-white/70 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800 backdrop-blur-md text-center text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center space-y-1 sm:space-y-0 sm:space-x-2">
+      <i class="fa-solid fa-graduation-cap text-blue-500"></i>
+      <span>Designed and Developed by JAYESH AND PRAKASH, Dept. of Electrical Engineering, Government College Of Engineering Yavatmal</span>
+    </div>
+  </footer>
+
+  <script src="/js/auth.js"></script>
+</body>
+</html>
