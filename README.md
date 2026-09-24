@@ -111,9 +111,10 @@ This application is 100% prepared for **Render**:
    - **Region**: Closest to you (e.g., Singapore or Frankfurt)
    - **Branch**: `main`
    - **Runtime**: `Node`
-   - **Build Command**: `npm install`
+   - **Build Command**: `npm install && npm rebuild sqlite3 --build-from-source`
    - **Start Command**: `npm start`
    - **Instance Type**: `Free`
+> **Important**: The Build Command `npm install && npm rebuild sqlite3 --build-from-source` ensures SQLite compiles natively against Render's Linux GLIBC version, preventing any `GLIBC_2.38 not found` runtime errors.
 5. Click **Create Web Service**.
 6. Once deployed, Render will provide a live URL such as:
    ```
